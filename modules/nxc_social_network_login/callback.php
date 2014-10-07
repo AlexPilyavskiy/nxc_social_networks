@@ -158,6 +158,8 @@ if( $object instanceof eZContentObject ) {
 			$redirectURI = $ini->variable( 'SiteSettings', 'DefaultPage' );
 		}
 
+		ezpEvent::getInstance()->notify('user/login');
+
 		return $module->redirectTo( $redirectURI );
 	}
 }
