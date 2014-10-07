@@ -3,6 +3,7 @@
 [General]
 # It could be email or remote_id
 UniqueUserIdentifier=email
+FeedCacheTTL=60
 
 OAuth2[facebook]=nxcSocialNetworksOAuth2Facebook
 OAuth2[twitter]=nxcSocialNetworksOAuth2Twitter

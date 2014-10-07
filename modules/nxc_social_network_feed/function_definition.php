@@ -189,4 +189,50 @@ $FunctionList['instagram_media_recent'] = array(
 	)
 );
 
+$FunctionList['youtube_activities'] = array(
+	'name'           => 'youtube_activities',
+	'call_method'    => array(
+		'class'  => 'nxcSocialNetworksFeedYoutube',
+		'method' => 'getActivitiesList'
+	),
+	'parameter_type' => 'standard',
+	'parameters'       => array(
+		array(
+			'name'     => 'channel_id',
+			'type'     => 'string',
+			'required' => false,
+			'default'  => false
+		),
+		array(
+			'name'     => 'limit',
+			'type'     => 'int',
+			'required' => false,
+			'default'  => 20
+		)
+	)
+);
+
+$FunctionList['youtube_videos'] = array(
+	'name'           => 'youtube_videos',
+	'call_method'    => array(
+		'class'  => 'nxcSocialNetworksFeedYoutube',
+		'method' => 'getVideosList'
+	),
+	'parameter_type' => 'standard',
+	'parameters'       => array(
+		array(
+			'name'     => 'playlist_id',
+			'type'     => 'string',
+			'required' => false,
+			'default'  => false
+		),
+		array(
+			'name'     => 'limit',
+			'type'     => 'int',
+			'required' => false,
+			'default'  => 20
+		)
+	)
+);
+
 ?>

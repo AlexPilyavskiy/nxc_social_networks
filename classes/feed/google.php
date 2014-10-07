@@ -21,7 +21,7 @@ class nxcSocialNetworksFeedGoogle extends nxcSocialNetworksFeed
 		$tmp    = json_decode( $token->attribute( 'token' ), true );
 		try{
 			$OAuth2->connection->refreshToken( $tmp['refresh_token'] );
-			$this->API = new apiPlusService( $OAuth2->connection );
+			$this->API = new Google_Service_Plus( $OAuth2->connection );
 		} catch( Exception $e ) {
 			eZDebug::writeError(
 				$e->getMessage(),
@@ -46,7 +46,7 @@ class nxcSocialNetworksFeedGoogle extends nxcSocialNetworksFeed
 				eZDebug::writeDebug(
 					array( 'user_id' => $userID, 'limit' => $limit ),
 					self::$debugMessagesGroup
-				);
+				);				
 
 				$response = $this->API->activities->listActivities(
 					$userID, 'public', array( 'maxResults' => $limit )
@@ -54,13 +54,14 @@ class nxcSocialNetworksFeedGoogle extends nxcSocialNetworksFeed
 
 				$activities  = array();
 				$currentTime = time();
-				foreach( $response['items'] as $activity ) {
-					$createdAt = strtotime( $activity['published'] );
+				foreach( $response->getItems() as $activity ) {					
+					$createdAt = strtotime( $activity->published );
+					$activity = $activity->toSimpleObject();
 
-					$activity['created_ago']       = self::getCreatedAgoString( $createdAt, $currentTime );
-					$activity['created_timestamp'] = $createdAt;
+					$activity->created_ago       = self::getCreatedAgoString( $createdAt, $currentTime );
+					$activity->created_timestamp = $createdAt;					
 
-					$activities[] = $activity;
+					$activities[] = (array)$activity;
 				}
 
 				$cacheFileHandler->fileStoreContents( $cacheFileHandler->filePath, serialize( $activities ) );
@@ -102,13 +103,14 @@ class nxcSocialNetworksFeedGoogle extends nxcSocialNetworksFeed
 
 				$activities  = array();
 				$currentTime = time();
-				foreach( $response['items'] as $activity ) {
-					$createdAt = strtotime( $activity['published'] );
+				foreach( $response->getItems() as $activity ) {					
+					$createdAt = strtotime( $activity->published );
+					$activity = $activity->toSimpleObject();
 
-					$activity['created_ago']       = self::getCreatedAgoString( $createdAt, $currentTime );
-					$activity['created_timestamp'] = $createdAt;
+					$activity->created_ago       = self::getCreatedAgoString( $createdAt, $currentTime );
+					$activity->created_timestamp = $createdAt;					
 
-					$activities[] = $activity;
+					$activities[] = (array)$activity;
 				}
 
 				$cacheFileHandler->fileStoreContents( $cacheFileHandler->filePath, serialize( $activities ) );
@@ -126,4 +128,6 @@ class nxcSocialNetworksFeedGoogle extends nxcSocialNetworksFeed
 		}
 	}
 }
+
+
 ?>

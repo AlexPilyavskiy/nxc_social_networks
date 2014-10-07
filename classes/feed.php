@@ -16,9 +16,11 @@ abstract class nxcSocialNetworksFeed
 	protected static $debugMessagesGroup = null;
 
 	public function __construct() {
+		$ini = eZINI::instance( 'nxcsocialnetworks.ini' );
+		$cacheTTL = ($ini->hasVariable('General', 'FeedCacheTTL')) ? (int)$ini->variable('General', 'FeedCacheTTL') : 60;
 		$this->cacheSettings = array(
 			'path' => eZSys::cacheDirectory() . '/' . static::$cacheDirectory . '/',
-			'ttl'  => 60
+			'ttl'  => $cacheTTL
 		);
 
 		$this->debugAccumulatorGroup = 'nxc_social_networks_feed_';

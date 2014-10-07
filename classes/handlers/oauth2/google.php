@@ -11,29 +11,27 @@ class nxcSocialNetworksOAuth2Google extends nxcSocialNetworksOAuth2
 	public static $tokenType = nxcSocialNetworksOAuth2Token::TYPE_GOOGLE;
 
 	protected function __construct() {
+		ini_set('display_errors', 1);
 		parent::__construct();
 
 		$redirectURL = '/nxc_social_network_token/get_access_token/google';
-		eZURI::transformURI( $redirectURL, false, 'full' );
-
-		$this->connection = new apiClient(
-			array(
-				'cacheClass' => 'apiFileCache',
-				'authClass'  => 'apiOAuth2',
-				'ioClass'    => 'apiCurlIO'
-			)
-		);
+		eZURI::transformURI( $redirectURL, false, 'full' );		
+		
+		$this->connection = new Google_Client();				
 		$this->connection->setClientId( $this->appSettings['key'] );
 		$this->connection->setClientSecret( $this->appSettings['secret'] );
 		$this->connection->setRedirectUri( $redirectURL );
 		$this->connection->setApplicationName( 'eZ Publish' );
 		$this->connection->setAccessType( 'offline' );
+		
+		$this->cacheClass = new Google_Cache_File( $this->connection );
+		$this->connection->setCache( $this->cacheClass );
 
 		$this->setState();
 	}
 
 	public function getPersistenceTokenScopes() {
-		return array( 'https://www.googleapis.com/auth/plus.me' );
+		return array( 'https://www.googleapis.com/auth/plus.me', 'https://www.googleapis.com/auth/youtube' );
 	}
 
 	public function getAuthorizeURL( array $scopes = null, $redirectURL = null ) {
@@ -57,7 +55,7 @@ class nxcSocialNetworksOAuth2Google extends nxcSocialNetworksOAuth2
 			eZURI::transformURI( $redirectURL, false, 'full' );
 			$this->connection->setRedirectUri( $redirectURL );
 		}
-		$this->connection->authenticate();
+		$this->connection->authenticate( $http->getVariable( 'code' ) );
 		$accessToken = $this->connection->getAccessToken();
 		return array(
 			'token'  => $accessToken,

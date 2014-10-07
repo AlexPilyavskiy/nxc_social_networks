@@ -34,7 +34,7 @@ class nxcSocialNetworksLoginHandlerGoogle extends nxcSocialNetworksLoginHandler
 	}
 
 	public function getUserRemoteID() {
-		$service = new apiOauth2Service( $this->OAunth2Connection->connection );
+		$service = new Google_Service_Oauth2( $this->OAunth2Connection->connection );
 
 		$token = $this->OAunth2Connection->getAccessToken( $this->getCallbackURL() );
 		$this->OAunth2Connection->connection->setAccessToken( $token['token'] );
