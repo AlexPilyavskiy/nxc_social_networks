@@ -10,8 +10,7 @@ class nxcSocialNetworksOAuth2Google extends nxcSocialNetworksOAuth2
 {
 	public static $tokenType = nxcSocialNetworksOAuth2Token::TYPE_GOOGLE;
 
-	protected function __construct() {
-		ini_set('display_errors', 1);
+	protected function __construct() {		
 		parent::__construct();
 
 		$redirectURL = '/nxc_social_network_token/get_access_token/google';
@@ -23,6 +22,7 @@ class nxcSocialNetworksOAuth2Google extends nxcSocialNetworksOAuth2
 		$this->connection->setRedirectUri( $redirectURL );
 		$this->connection->setApplicationName( 'eZ Publish' );
 		$this->connection->setAccessType( 'offline' );
+		$this->connection->setApprovalPrompt('force');
 		
 		$this->cacheClass = new Google_Cache_File( $this->connection );
 		$this->connection->setCache( $this->cacheClass );
