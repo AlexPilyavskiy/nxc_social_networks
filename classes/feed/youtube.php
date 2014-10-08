@@ -65,6 +65,9 @@ class nxcSocialNetworksFeedYoutube extends nxcSocialNetworksFeed
 				$currentTime = time();
 				foreach( $response->getItems() as $activity ) {							
 					$activity = $activity->toSimpleObject();
+					if ( $activity->snippet['type'] == 'subscription' && $activity->contentDetails['subscription']['resourceId']['channelId'] ) {
+						$activity->contentDetails['subscription'] = $this->getCannelDescription( $activity->contentDetails['subscription']['resourceId']['channelId'] );
+					}
 					$createdAt = strtotime( $activity->snippet['publishedAt'] );
 
 					$activity->created_ago       = self::getCreatedAgoString( $createdAt, $currentTime );
@@ -163,6 +166,12 @@ class nxcSocialNetworksFeedYoutube extends nxcSocialNetworksFeed
 
 			$videos[] = $activity;
 		}		
+	}
+	
+	private function getCannelDescription( $channelId ) {
+		$playlistRequest = $this->API->channels->listChannels( 'snippet', array('id' => $channelId));
+		$items = $playlistRequest->getItems();
+		return (array)$items[0]->toSimpleObject();
 	}
 	
 }
