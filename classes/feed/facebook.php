@@ -27,6 +27,7 @@ class nxcSocialNetworksFeedFacebook extends nxcSocialNetworksFeed
 	}
 
 	public function getTimeline( $pageID = false, $limit = 20, $type = 'feed' ) {
+        ini_set('display_errors',1);
 		$result = array( 'result' => array() );
 
 		$accumulator = $this->debugAccumulatorGroup . '_facebook_timeline';
@@ -62,7 +63,8 @@ class nxcSocialNetworksFeedFacebook extends nxcSocialNetworksFeed
 					if( isset( $message['message'] ) ) {
 						$message['message'] = self::fixMessageLinks( $message['message'] );
 					}
-					$messages[] = $message;
+                    $this->getPicture( $message );
+                    $messages[] = $message;
 				}
 
 				$cacheFileHandler->fileStoreContents( $cacheFileHandler->filePath, serialize( $messages ) );
@@ -85,5 +87,25 @@ class nxcSocialNetworksFeedFacebook extends nxcSocialNetworksFeed
 
 		return $message;
 	}
+    
+    private function getPicture( &$message ) {
+        if ( $message['type'] && $message['type'] == 'photo' && isset($message['object_id']) ) {
+            $response = $this->API->api(
+                $message['object_id'],
+                array( 'access_token' => $this->acessToken 
+                    )
+            );
+            if ( $response && $response['source'] ) {
+                $message['picture'] = $response['source'];
+            }            
+        }
+        else {
+            if ( isset($message['picture']) && preg_match('/&url=(.*)/', $message['picture'], $url) ) {
+                if (is_array($url) && isset($url[1])) {
+                    $message['picture'] = urldecode($url[1]);
+                }
+            }
+        }
+    }
 }
 ?>
