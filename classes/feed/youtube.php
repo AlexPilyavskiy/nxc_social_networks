@@ -18,20 +18,34 @@ class nxcSocialNetworksFeedYoutube extends nxcSocialNetworksFeed
 
 		$OAuth2 = nxcSocialNetworksOAuth2::getInstanceByType( 'google' );
 		$token  = $OAuth2->getToken();
-		$tmp    = json_decode( $token->attribute( 'token' ), true );
-		try{
-			$OAuth2->connection->refreshToken( $tmp['refresh_token'] );
-			$this->API = new Google_Service_YouTube( $OAuth2->connection );
-		} catch( Exception $e ) {
-			eZDebug::writeError(
-				$e->getMessage(),
-				self::$debugMessagesGroup
-			);
-		}
+        if ( $token ) {
+            $tmp    = json_decode( $token->attribute( 'token' ), true );
+            try{
+                $OAuth2->connection->refreshToken( $tmp['refresh_token'] );
+                $this->API = new Google_Service_YouTube( $OAuth2->connection );
+            } catch( Exception $e ) {
+                eZDebug::writeError(
+                    $e->getMessage(),
+                    self::$debugMessagesGroup
+                );
+            }
+        }
+        else {
+            $this->API = false;
+            eZDebug::writeError(
+                'Skipping youtube feed: no access token',
+                self::$debugMessagesGroup
+            );
+        }
+        
 	}
 
 	public function getActivitiesList( $channel_id = false, $limit = 20 ) {
 		$result = array( 'result' => array() );
+        
+        if ( !$this->API ) {
+            return $result;
+        }
 
 		$accumulator = $this->debugAccumulatorGroup . '_youtube_activities_list';
 		eZDebug::accumulatorStart(
@@ -95,8 +109,12 @@ class nxcSocialNetworksFeedYoutube extends nxcSocialNetworksFeed
 		}
 	}
 	
-	public function getVideosList( $playlist_id = false, $limit = 20 ) {
+	public function getVideosList( $playlist_id = false, $limit = 20 ) {                
 		$result = array( 'result' => array() );
+        
+        if ( !$this->API ) {
+            return $result;
+        }
 
 		$accumulator = $this->debugAccumulatorGroup . '_youtube_videos_list';
 		eZDebug::accumulatorStart(
